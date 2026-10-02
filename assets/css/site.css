@@ -209,8 +209,9 @@ h1, h2, h3 {
 
 @media (max-width: 860px) {
   .brand__rule, .brand__sub { display: none; }
-  .nav { gap: 1.25rem; font-size: 0.75rem; }
-  .nav__only-wide { display: none; }
+  /* Only two links survive the narrow layout, and the page is a single
+     scroll. Drop the nav entirely and leave the masthead to the mark. */
+  .nav { display: none; }
 }
 
 /* ---------- hero ---------- */
