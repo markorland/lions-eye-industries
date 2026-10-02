@@ -325,6 +325,8 @@ h1, h2, h3 {
   border-bottom: 1px solid var(--line);
   border-right: 1px solid var(--line);
   padding: 1.75rem 1.5rem 1.625rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .stats > div:first-child { border-left: 1px solid var(--line); }
@@ -339,7 +341,7 @@ h1, h2, h3 {
 }
 
 .stats dd {
-  margin: 0;
+  margin: auto 0 0;   /* bottom-aligned: one- and two-line labels agree */
   font-size: clamp(1.75rem, 3.1vw, 2.625rem);
   line-height: 1;
   letter-spacing: -0.035em;
