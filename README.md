@@ -4,12 +4,15 @@ A one-page corporate site for a fictional multinational, deployed with GitHub Pa
 Plain static HTML and CSS — no build step, no dependencies.
 
 ```
-index.html            the whole site
-figures.config.js     the group figures — the one file you edit routinely
-404.html              deadpan not-found page
-assets/css/site.css   all styles (CSS custom properties at the top)
-assets/img/mark.svg   eye device / favicon
-CNAME                 custom domain for GitHub Pages
+index.html                 the whole site
+figures.config.js          the group figures — the one file you edit routinely
+404.html                   deadpan not-found page
+assets/css/site.css        all styles (CSS custom properties at the top)
+assets/img/logo.svg        eye device / favicon
+assets/img/logo-email.png  the same logo for email signatures
+assets/signatures.html     the three signatures, rendered for copying
+tools/make-logo.py         redraws logo-email.png; no dependencies
+CNAME                      custom domain for GitHub Pages
 ```
 
 ## Moving the numbers
@@ -112,3 +115,14 @@ It also carries a list of cases where it breaks character and answers plainly in
 acting on a belief that the company is real in a way that could cost them something, legal or
 official process, apparent minors or distress, and anyone who asks outright whether the company
 exists.
+
+### Signatures
+
+`assets/signatures.html` renders a signature for each mailbox, each signed by its desk rather
+than by a person. Open it, select a signature inside its dashed box, and paste the rendered block
+into the mailbox settings — Gmail's signature editor has no HTML view, so pasting source would
+show the markup as text. The page is unlinked and `noindex`.
+
+The logo in them loads from `lionseyeindustries.com/assets/img/logo-email.png`, so images appear
+only once the domain resolves. It is a PNG rather than the site's SVG because almost no mail
+client renders SVG; `tools/make-logo.py` redraws it if the size or colour ever needs to change.
