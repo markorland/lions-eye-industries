@@ -24,8 +24,9 @@ GUTTER = 18
 DESKS = [
     dict(key="secretary", desk="Office of the Secretary",
          addr="enquiries@lionseyeindustries.com",
-         fine=["Lions Eye Industries S.A. &middot; Registered office "
-               "46&deg;12&prime;14.84&Prime;&nbsp;N, 6&deg;09&prime;08.73&Prime;&nbsp;E",
+         fine=["Lions Eye Industries S.A.",
+               "Registered office 46&deg;12&prime;14.84&Prime;&nbsp;N, "
+               "6&deg;09&prime;08.73&Prime;&nbsp;E",
                "Correspondence is read and retained indefinitely."]),
     dict(key="disclosure", desk="Group Disclosure",
          addr="disclosure@lionseyeindustries.com",
