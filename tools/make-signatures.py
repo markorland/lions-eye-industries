@@ -5,21 +5,24 @@ Run from the repo root: python3 tools/make-signatures.py
 The three signatures share a layout and differ only in the desk name and the
 two fine-print lines, so they are generated rather than hand-kept.
 
-Both rules are table cells carrying a bgcolor attribute, not CSS borders.
-Outlook renders mail through Word's engine and Gmail rewrites HTML as you
-paste it into the signature box; between them, a border-left on a <td> and a
-1px-tall <div> are the first two things to vanish. A table cell with a
-background colour is the one construct every client honours. Spacing around
-the rules is cell padding for the same reason — margins do not survive.
+Nothing in the layout depends on CSS. Clients strip padding when the markup is
+pasted into a signature box, so gaps are transparent 1x1 images stretched by
+their width and height attributes — dimensions survive where styles do not —
+and the horizontal rule is an <hr>, which carries its own margins and is kept
+by sanitisers because it is semantic HTML. The <hr> also takes size, noshade
+and color attributes, so a fully stripped fallback is still a hairline rather
+than the default 3D line. Styles remain on the text for colour and face; if
+they are dropped, the signature degrades to plain text in the right order.
 """
 
 LOGO = "https://lionseyeindustries.com/assets/img/logo-email.png"
 SPACER = "https://lionseyeindustries.com/assets/img/spacer.png"
 SANS = "Arial, Helvetica, sans-serif"
 RULE = "#dcd8cf"
+GUTTER = 18
 
 DESKS = [
-    dict(key="secretary", desk="Office of the Secretary", variant="attrs",
+    dict(key="secretary", desk="Office of the Secretary",
          addr="enquiries@lionseyeindustries.com",
          fine=["Lions Eye Industries S.A. &middot; Registered office "
                "46&deg;12&prime;14.84&Prime;&nbsp;N, 6&deg;09&prime;08.73&Prime;&nbsp;E",
@@ -34,40 +37,13 @@ DESKS = [
                "This message is not an offer and creates no obligation."]),
 ]
 
-FINE = ('        <tr>\n'
-        '          <td style="font-family:%s;font-size:11px;line-height:17px;'
-        'color:#6a6862;%s">%s</td>\n'
-        '        </tr>')
-
-SIG = '''<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-  <tr>
-    <td style="padding:0 18px 0 0;vertical-align:middle;">
-      <img src="%(logo)s" width="57" height="38" alt="Lions Eye Industries"
-           style="display:block;width:57px;height:38px;border:0;outline:none;text-decoration:none;">
-    </td>
-    <td width="1" bgcolor="%(rule)s" style="width:1px;min-width:1px;background-color:%(rule)s;font-size:1px;line-height:1px;">&nbsp;</td>
-    <td style="padding:0 0 0 18px;vertical-align:middle;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-        <tr>
-          <td style="font-family:%(sans)s;font-size:13px;line-height:18px;letter-spacing:2px;color:#14161a;font-weight:bold;">LIONS EYE INDUSTRIES</td>
-        </tr>
-        <tr>
-          <td style="font-family:%(sans)s;font-size:13px;line-height:20px;color:#8a6a22;padding:0 0 10px;">%(desk)s</td>
-        </tr>
-        <tr>
-          <td height="1" bgcolor="%(rule)s" style="height:1px;line-height:1px;font-size:1px;background-color:%(rule)s;">&nbsp;</td>
-        </tr>
-%(fine)s
-      </table>
-    </td>
-  </tr>
-</table>'''
-
-
 SPACER_IMG = ('<img src="%s" width="%%d" height="%%d" alt="" '
               'style="display:block;border:0;">' % SPACER)
 
-ATTRS_SIG = '''<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+FINE = ('      <div style="font-family:%s;font-size:11px;line-height:17px;'
+        'color:#6a6862;">%s</div>')
+
+SIG = '''<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
   <tr>
     <td valign="middle">
       <img src="%(logo)s" width="57" height="38" alt="Lions Eye Industries"
@@ -85,35 +61,15 @@ ATTRS_SIG = '''<table role="presentation" cellpadding="0" cellspacing="0" border
   </tr>
 </table>'''
 
-ATTRS_FINE = ('      <div style="font-family:%s;font-size:11px;line-height:17px;'
-              'color:#6a6862;">%s</div>')
-
-
-def attrs_signature(d):
-    """Variant under test: no CSS padding anywhere.
-
-    Gaps are transparent 1px images stretched by their width and height
-    attributes, and the horizontal rule is an <hr>, which carries its own
-    margins and survives sanitisers because it is semantic HTML. Even with
-    every style attribute stripped, the gutters hold and the rule draws.
-    """
-    fine = "\n".join(ATTRS_FINE % (SANS, line) for line in d["fine"])
-    return ATTRS_SIG % dict(logo=LOGO, sans=SANS, rule=RULE, desk=d["desk"],
-                            fine=fine, gutter=SPACER_IMG % (18, 1),
-                            hair=SPACER_IMG % (1, 1))
-
 
 def signature(d):
-    if d.get("variant") == "attrs":
-        return attrs_signature(d)
-    fine = "\n".join(
-        FINE % (SANS, "padding:9px 0 0;" if i == 0 else "", line)
-        for i, line in enumerate(d["fine"]))
-    return SIG % dict(logo=LOGO, sans=SANS, rule=RULE, desk=d["desk"], fine=fine)
+    fine = "\n".join(FINE % (SANS, line) for line in d["fine"])
+    return SIG % dict(logo=LOGO, sans=SANS, rule=RULE, desk=d["desk"], fine=fine,
+                      gutter=SPACER_IMG % (GUTTER, 1), hair=SPACER_IMG % (1, 1))
 
 
 SECTION = '''  <section>
-    <h2>%s <span>%s</span></h2>%s
+    <h2>%s <span>%s</span></h2>
     <div class="sig">
 %s
     </div>
@@ -139,7 +95,6 @@ PAGE = '''<!doctype html>
   footer { margin-top:56px; padding-top:20px; border-top:1px solid #e6e2d9;
            color:#6a6862; font-size:13px; }
   code { background:#f4f2ed; padding:1px 5px; border-radius:3px; font-size:12px; }
-  .note { margin:0 0 12px; font-size:12px; color:#8a6a22; max-width:62ch; }
 </style>
 </head>
 <body>
@@ -151,22 +106,16 @@ PAGE = '''<!doctype html>
 %s
 
   <footer>
-    The logo loads from <code>lionseyeindustries.com/assets/img/logo-email.png</code>, so images
-    only appear once the custom domain resolves. This page is not linked from the site and is
-    marked <code>noindex</code>; delete it once the signatures are installed.
+    Images load from <code>lionseyeindustries.com/assets/img/</code>, so the logo and the spacers
+    that hold the gaps open only appear once the custom domain resolves. This page is not linked
+    from the site and is marked <code>noindex</code>; delete it once the signatures are installed.
   </footer>
 </div>
 </body>
 </html>
 '''.replace("SANS_STACK", SANS)
 
-NOTE = ('\n    <p class="note">Under test: gaps are spacer images and the rule is an '
-        '&lt;hr&gt;, so nothing here depends on CSS padding. Compare with the two below.</p>')
-blocks = "\n\n".join(
-    SECTION % (d["desk"], d["addr"],
-               NOTE if d.get("variant") == "attrs" else "",
-               signature(d))
-    for d in DESKS)
+blocks = "\n\n".join(SECTION % (d["desk"], d["addr"], signature(d)) for d in DESKS)
 open("assets/signatures.html", "w").write(PAGE % blocks)
 
 for d in DESKS:

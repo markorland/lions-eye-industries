@@ -11,7 +11,8 @@ assets/css/site.css        all styles (CSS custom properties at the top)
 assets/img/logo.svg        eye device / favicon
 assets/img/logo-email.png  the same logo for email signatures
 assets/signatures.html     the three signatures, rendered for copying
-tools/make-logo.py         redraws logo-email.png; no dependencies
+assets/img/spacer.png      1x1 transparent pixel; holds signature gaps open
+tools/make-logo.py         redraws logo-email.png and spacer.png; no dependencies
 tools/make-signatures.py   rewrites assets/signatures.html
 CNAME                      custom domain for GitHub Pages
 ```
@@ -130,5 +131,11 @@ client renders SVG; `tools/make-logo.py` redraws it if the size or colour ever n
 
 The three signatures differ only in the desk name and their two fine-print lines, so edit
 `tools/make-signatures.py` and re-run it rather than changing the generated HTML three times.
+
+Nothing in their layout depends on CSS, because clients strip padding when markup is pasted into
+a signature box. Gaps are transparent 1x1 images stretched by their `width` and `height`
+attributes, and the horizontal rule is an `<hr>`, which brings its own margins and survives
+sanitisers because it is semantic HTML. Styles remain on the text for colour and face only; if
+those go, the signature degrades to plain text in the right order.
 No signature carries an email address or a link: the addresses exist only on this site, so
 anyone writing in has already been to it.
