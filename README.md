@@ -130,4 +130,5 @@ client renders SVG; `tools/make-logo.py` redraws it if the size or colour ever n
 
 The three signatures differ only in the desk name and their two fine-print lines, so edit
 `tools/make-signatures.py` and re-run it rather than changing the generated HTML three times.
-Neither signature carries its own email address — it is already in the From header.
+No signature carries an email address or a link: the addresses exist only on this site, so
+anyone writing in has already been to it.

@@ -38,10 +38,7 @@ def signature(d):
     </td>
     <td style="padding:0 0 0 16px;vertical-align:top;border-left:1px solid #e2ded5;">
       <div style="font-family:{SANS};font-size:13px;line-height:18px;letter-spacing:2px;color:#14161a;font-weight:bold;">LIONS EYE INDUSTRIES</div>
-      <div style="font-family:{SANS};font-size:13px;line-height:20px;color:#8a6a22;">{d["desk"]}</div>
-      <div style="font-family:{SANS};font-size:13px;line-height:20px;color:#14161a;">
-        <a href="https://lionseyeindustries.com" style="color:#14161a;text-decoration:none;">lionseyeindustries.com</a>
-      </div>
+      <div style="font-family:{SANS};font-size:13px;line-height:21px;color:#8a6a22;">{d["desk"]}</div>
       <div style="height:1px;line-height:1px;font-size:0;background:#e2ded5;margin:10px 0 8px;">&nbsp;</div>
 {fine}
     </td>
