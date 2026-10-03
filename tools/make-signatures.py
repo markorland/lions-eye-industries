@@ -14,11 +14,12 @@ the rules is cell padding for the same reason — margins do not survive.
 """
 
 LOGO = "https://lionseyeindustries.com/assets/img/logo-email.png"
+SPACER = "https://lionseyeindustries.com/assets/img/spacer.png"
 SANS = "Arial, Helvetica, sans-serif"
 RULE = "#dcd8cf"
 
 DESKS = [
-    dict(key="secretary", desk="Office of the Secretary",
+    dict(key="secretary", desk="Office of the Secretary", variant="attrs",
          addr="enquiries@lionseyeindustries.com",
          fine=["Lions Eye Industries S.A. &middot; Registered office "
                "46&deg;12&prime;14.84&Prime;&nbsp;N, 6&deg;09&prime;08.73&Prime;&nbsp;E",
@@ -63,7 +64,48 @@ SIG = '''<table role="presentation" cellpadding="0" cellspacing="0" border="0" s
 </table>'''
 
 
+SPACER_IMG = ('<img src="%s" width="%%d" height="%%d" alt="" '
+              'style="display:block;border:0;">' % SPACER)
+
+ATTRS_SIG = '''<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+  <tr>
+    <td valign="middle">
+      <img src="%(logo)s" width="57" height="38" alt="Lions Eye Industries"
+           style="display:block;width:57px;height:38px;border:0;outline:none;text-decoration:none;">
+    </td>
+    <td valign="middle">%(gutter)s</td>
+    <td bgcolor="%(rule)s" valign="middle" style="background-color:%(rule)s;">%(hair)s</td>
+    <td valign="middle">%(gutter)s</td>
+    <td valign="middle">
+      <div style="font-family:%(sans)s;font-size:13px;line-height:18px;letter-spacing:2px;color:#14161a;font-weight:bold;">LIONS EYE INDUSTRIES</div>
+      <div style="font-family:%(sans)s;font-size:13px;line-height:20px;color:#8a6a22;">%(desk)s</div>
+      <hr size="1" noshade color="%(rule)s" style="border:0;border-top:1px solid %(rule)s;height:1px;margin:10px 0 9px;">
+%(fine)s
+    </td>
+  </tr>
+</table>'''
+
+ATTRS_FINE = ('      <div style="font-family:%s;font-size:11px;line-height:17px;'
+              'color:#6a6862;">%s</div>')
+
+
+def attrs_signature(d):
+    """Variant under test: no CSS padding anywhere.
+
+    Gaps are transparent 1px images stretched by their width and height
+    attributes, and the horizontal rule is an <hr>, which carries its own
+    margins and survives sanitisers because it is semantic HTML. Even with
+    every style attribute stripped, the gutters hold and the rule draws.
+    """
+    fine = "\n".join(ATTRS_FINE % (SANS, line) for line in d["fine"])
+    return ATTRS_SIG % dict(logo=LOGO, sans=SANS, rule=RULE, desk=d["desk"],
+                            fine=fine, gutter=SPACER_IMG % (18, 1),
+                            hair=SPACER_IMG % (1, 1))
+
+
 def signature(d):
+    if d.get("variant") == "attrs":
+        return attrs_signature(d)
     fine = "\n".join(
         FINE % (SANS, "padding:9px 0 0;" if i == 0 else "", line)
         for i, line in enumerate(d["fine"]))
@@ -71,7 +113,7 @@ def signature(d):
 
 
 SECTION = '''  <section>
-    <h2>%s <span>%s</span></h2>
+    <h2>%s <span>%s</span></h2>%s
     <div class="sig">
 %s
     </div>
@@ -97,6 +139,7 @@ PAGE = '''<!doctype html>
   footer { margin-top:56px; padding-top:20px; border-top:1px solid #e6e2d9;
            color:#6a6862; font-size:13px; }
   code { background:#f4f2ed; padding:1px 5px; border-radius:3px; font-size:12px; }
+  .note { margin:0 0 12px; font-size:12px; color:#8a6a22; max-width:62ch; }
 </style>
 </head>
 <body>
@@ -117,7 +160,13 @@ PAGE = '''<!doctype html>
 </html>
 '''.replace("SANS_STACK", SANS)
 
-blocks = "\n\n".join(SECTION % (d["desk"], d["addr"], signature(d)) for d in DESKS)
+NOTE = ('\n    <p class="note">Under test: gaps are spacer images and the rule is an '
+        '&lt;hr&gt;, so nothing here depends on CSS padding. Compare with the two below.</p>')
+blocks = "\n\n".join(
+    SECTION % (d["desk"], d["addr"],
+               NOTE if d.get("variant") == "attrs" else "",
+               signature(d))
+    for d in DESKS)
 open("assets/signatures.html", "w").write(PAGE % blocks)
 
 for d in DESKS:

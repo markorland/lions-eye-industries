@@ -1,6 +1,10 @@
-"""Draw assets/img/logo-email.png — the email version of the eye logo.
+"""Draw the images the email signatures need.
 
 Run from the repo root: python3 tools/make-logo.py
+
+Writes assets/img/logo-email.png (the eye) and assets/img/spacer.png (a 1x1
+transparent pixel, stretched with width and height attributes to hold gaps
+open where a mail client has stripped the CSS padding).
 
 The site's logo is an SVG, which almost no mail client renders, so the email
 signatures need a PNG. Two things differ from assets/img/logo.svg: the
@@ -78,3 +82,13 @@ png = (b'\x89PNG\r\n\x1a\n'
 
 open('assets/img/logo-email.png', 'wb').write(png)
 print(f"wrote assets/img/logo-email.png  {W}x{HGT}  {len(png)} bytes  (display {W//SCALE}x{HGT//SCALE})")
+
+# A single transparent pixel. Mail clients honour an image's width and height
+# attributes even when they have thrown away every scrap of CSS, so one of
+# these scaled to 18x1 is a gap that cannot be sanitised away.
+spacer = (b'\x89PNG\r\n\x1a\n'
+          + chunk(b'IHDR', struct.pack('>IIBBBBB', 1, 1, 8, 6, 0, 0, 0))
+          + chunk(b'IDAT', zlib.compress(b'\x00\x00\x00\x00\x00', 9))
+          + chunk(b'IEND', b''))
+open('assets/img/spacer.png', 'wb').write(spacer)
+print(f"wrote assets/img/spacer.png  1x1  {len(spacer)} bytes")
