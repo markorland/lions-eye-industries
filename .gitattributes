@@ -1,0 +1,7 @@
+# The repository lives on an NTFS mount, so Windows-side tooling keeps rewriting
+# line endings and leaving files dirty with no real change. Normalise instead:
+# LF in the repository and in the working tree, everywhere.
+* text=auto eol=lf
+
+# Never touch these.
+*.png binary
