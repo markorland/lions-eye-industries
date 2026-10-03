@@ -12,6 +12,7 @@ assets/img/logo.svg        eye device / favicon
 assets/img/logo-email.png  the same logo for email signatures
 assets/signatures.html     the three signatures, rendered for copying
 tools/make-logo.py         redraws logo-email.png; no dependencies
+tools/make-signatures.py   rewrites assets/signatures.html
 CNAME                      custom domain for GitHub Pages
 ```
 
@@ -126,3 +127,7 @@ show the markup as text. The page is unlinked and `noindex`.
 The logo in them loads from `lionseyeindustries.com/assets/img/logo-email.png`, so images appear
 only once the domain resolves. It is a PNG rather than the site's SVG because almost no mail
 client renders SVG; `tools/make-logo.py` redraws it if the size or colour ever needs to change.
+
+The three signatures differ only in the desk name and their two fine-print lines, so edit
+`tools/make-signatures.py` and re-run it rather than changing the generated HTML three times.
+Neither signature carries its own email address — it is already in the From header.
